@@ -3,15 +3,15 @@
 //
 
 #include <iostream>
-#include <thread>
 #include <fstream>
 #include <string>
 #include "../include/Game.h"
 #include "../include/Enemy.h"
 #include "../include/Player.h"
+#include "../include/ScoreManager.h"
 
-Game::Game(int width, int height): m_ScreenWidth(width), m_screenHeight(height), m_Score(0), m_Quit(false),m_Name() {
-    InitWindow(m_ScreenWidth, m_screenHeight, "SpaceInvaders");
+Game::Game(int width, int height): m_ScreenWidth(width), m_ScreenHeight(height), m_Score(0), m_Quit(false), m_Name() {
+    InitWindow(m_ScreenWidth, m_ScreenHeight, "SpaceInvaders");
     SetTargetFPS(300);
 
     m_Textures = LoadTexture("../assets/Space_Invaders.png");
@@ -20,8 +20,8 @@ Game::Game(int width, int height): m_ScreenWidth(width), m_screenHeight(height),
     m_HighscoreButton = LoadTexture("../assets/Highscore_Button.png");
     m_BackButton = LoadTexture("../assets/Back_Button.png");
 
-    m_StartBounds = {(float)m_ScreenWidth / 2 - 34, (float)m_screenHeight / 2, 68, 25};
-    m_QuitBounds = {(float)m_ScreenWidth / 2 - 23, (float)m_screenHeight / 2 + 50, 46, 20};
+    m_StartBounds = {(float)m_ScreenWidth / 2 - 34, (float)m_ScreenHeight / 2, 68, 25};
+    m_QuitBounds = {(float)m_ScreenWidth / 2 - 23, (float)m_ScreenHeight / 2 + 50, 46, 20};
     m_HighscoreBounds = {(float)m_ScreenWidth - 40, 10, 22, 19};
     m_BackBounds = {(float)10,(float)10,54,22};
     m_MousePosition = {0.f,0.f};
@@ -29,7 +29,7 @@ Game::Game(int width, int height): m_ScreenWidth(width), m_screenHeight(height),
 
     m_Screen = Screens::START;
     m_PlayerProjectile = nullptr;
-    LoadHighscores();
+    m_ScoreManager = new ScoreManager(m_ScreenWidth, m_ScreenHeight);
 }
 
 Game::~Game() {
@@ -39,66 +39,6 @@ Game::~Game() {
     UnloadTexture(m_StartButton);
     UnloadTexture(m_QuitButton);
     UnloadTexture(m_HighscoreButton);
-}
-
-void Game::LoadHighscores() {
-    std::ifstream file;
-    std::string line;
-    std::string name;
-    std::string value;
-    file.open("highscores.txt");
-
-    if(!file.is_open())
-        return;
-
-    while(!file.eof()){
-
-        getline(file, line);
-        for(char & it : line){
-            if(it != ' '){
-                if(isdigit(it)) {
-                    value += it;
-                }
-                else
-                    name += it;
-            }
-        }
-        if(!value.empty()) {
-            m_Highscores.emplace_back(std::make_pair(name,std::stoi(value)));
-        }
-        name.clear();
-        value.clear();
-
-    }
-}
-
-void Game::CheckIfNewHighscore(){
-    for(auto &scores: m_Highscores){
-        if(m_Score > scores.second){
-            m_NewHighscore = true;
-        }
-    }
-}
-
-void Game::SaveNewHighscore(){
-    for(auto score = m_Highscores.end()-1; score != m_Highscores.begin();score--){
-        if(score->second > m_Score){
-            m_Highscores.insert(score+1,std::make_pair(m_Name,m_Score));
-            m_Highscores.pop_back();
-            m_Screen = Screens::START;
-            break;
-        }
-    }
-    std::ofstream file;
-    file.open("highscores.txt", std::ios::out);
-
-
-    if(!file.is_open())
-        return;
-    for(auto &highscore: m_Highscores){
-        file << highscore.first << " " << highscore.second << std::endl;
-    }
-    file.close();
 }
 
 bool Game::GetHighscoreName(){
@@ -198,7 +138,7 @@ void Game::UpdateGame(){
     //Update Enemy Projectiles and delete them if they are out of the screen
     for(auto pIt = m_EnemyProjectiles.begin(); pIt != m_EnemyProjectiles.end();){
         (*pIt)->Update();
-        if((*pIt)->GetPosition().y > (float)m_screenHeight){
+        if((*pIt)->GetPosition().y > (float)m_ScreenHeight){
             delete (*pIt);
             pIt = m_EnemyProjectiles.erase(pIt);
         }else
@@ -223,17 +163,13 @@ void Game::UpdateGame(){
 }
 
 void Game::UpdateEndscreen(){
-
-    CheckIfNewHighscore();
-    if(!m_NewHighscore) {
+    if(!m_ScoreManager->CheckIfNewHighscore(m_Score)) {
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
             m_Screen = Screens::START;
     }else{
         if(GetHighscoreName())
-            SaveNewHighscore();
+            m_ScoreManager->SaveNewHighscore(m_Name,m_Score);
      }
-
-
 }
 
 void Game::UpdateHighscore(){
@@ -247,8 +183,6 @@ void Game::UpdateHighscore(){
     if(backActive) {
         m_Screen = Screens::START;
     }
-
-
 }
 
 void Game::CheckHit() {
@@ -348,22 +282,8 @@ void Game::DrawGameOverScreen(){
 }
 
 void Game::DrawHighscore(){
-    int i = 1;
-    int offset = 40;
-    int longest_text = 0;
     DrawTextureRec(m_BackButton,(Rectangle){.x=0,.y=0,.width=54,.height=22},(Vector2){m_BackBounds.x,m_BackBounds.y},WHITE);
-
-    for(auto &scores:m_Highscores){
-        if(MeasureText(scores.first.c_str(),20) > longest_text)
-            longest_text = MeasureText(scores.first.c_str(),20);
-    }
-
-    for(auto &scores:m_Highscores){
-
-        DrawText(FormatText("%i. %s",i,scores.first.c_str()), m_ScreenWidth / 2 - longest_text, 20 + ((i - 1) * offset), 20, WHITE);
-        DrawText(FormatText("%i",scores.second), m_ScreenWidth / 2 + longest_text, 20 + ((i - 1) * offset), 20, WHITE);
-        ++i;
-    }
+    m_ScoreManager->Draw();
 }
 
 void Game::CreateLevel1(){

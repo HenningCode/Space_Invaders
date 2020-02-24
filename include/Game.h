@@ -11,6 +11,7 @@
 #include <string>
 #include "Enemy.h"
 #include "Player.h"
+#include "ScoreManager.h"
 
 enum class Screens{START, GAME, END, HIGHSCORE};
 
@@ -40,18 +41,16 @@ private:
     void UpdateHighscore();
     void UpdateEndscreen();
 
-    void LoadHighscores();
-    void CheckIfNewHighscore();
-    void SaveNewHighscore();
     bool GetHighscoreName();
 
     std::list<Enemy*> m_Enemys;
     std::list<Projectile*> m_EnemyProjectiles;
     Projectile* m_PlayerProjectile;
     Player* m_Player;
+    ScoreManager* m_ScoreManager;
 
     int m_ScreenWidth;
-    int m_screenHeight;
+    int m_ScreenHeight;
     int m_Score;
     bool m_Quit;
     bool m_NewHighscore;
