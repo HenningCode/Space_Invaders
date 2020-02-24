@@ -147,9 +147,6 @@ void Game::UpdateStart() {
     bool quitActive = false;
     bool highscoreActive = false;
     m_MousePosition = GetMousePosition();
-    m_MousePosition.x *= 2;
-    m_MousePosition.y *= 2;
-
 
     if(CheckCollisionPointRec(m_MousePosition,m_StartBounds))
         if(IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
@@ -242,8 +239,6 @@ void Game::UpdateEndscreen(){
 void Game::UpdateHighscore(){
     bool backActive = false;
     m_MousePosition = GetMousePosition();
-    m_MousePosition.x *= 2;
-    m_MousePosition.y *= 2;
 
     if(CheckCollisionPointRec(m_MousePosition,m_BackBounds))
         if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
