@@ -36,6 +36,16 @@ raylib.h
 raylib.h
 -
 
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/src/Enemy.cpp
+../include/Enemy.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Enemy.h
+../include/Projectile.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Projectile.h
+iostream
+-
+random
+-
+
 /Users/henningwilmer/Programmieren/CLion/Space_Invaders/src/Game.cpp
 iostream
 -
@@ -52,7 +62,25 @@ string
 ../include/Player.h
 /Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Player.h
 
-/usr/local/Cellar/raylib/2.5.0/include/raylib.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/src/Player.cpp
+../include/Player.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Player.h
+../include/Projectile.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Projectile.h
+raylib.h
+-
+iostream
+-
+
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/src/Projectile.cpp
+../include/Projectile.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Projectile.h
+
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/src/main.cpp
+../include/Game.h
+/Users/henningwilmer/Programmieren/CLion/Space_Invaders/include/Game.h
+
+/usr/local/Cellar/raylib/2.6.0/include/raylib.h
 stdarg.h
 -
 stdbool.h

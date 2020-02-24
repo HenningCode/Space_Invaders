@@ -139,7 +139,7 @@ Space_Invaders: CMakeFiles/Space_Invaders.dir/src/Game.cpp.o
 Space_Invaders: CMakeFiles/Space_Invaders.dir/src/Player.cpp.o
 Space_Invaders: CMakeFiles/Space_Invaders.dir/src/Projectile.cpp.o
 Space_Invaders: CMakeFiles/Space_Invaders.dir/build.make
-Space_Invaders: /usr/local/Cellar/raylib/2.5.0/lib/libraylib.dylib
+Space_Invaders: /usr/local/Cellar/raylib/2.6.0/lib/libraylib.dylib
 Space_Invaders: CMakeFiles/Space_Invaders.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henningwilmer/Programmieren/CLion/Space_Invaders/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable Space_Invaders"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Space_Invaders.dir/link.txt --verbose=$(VERBOSE)

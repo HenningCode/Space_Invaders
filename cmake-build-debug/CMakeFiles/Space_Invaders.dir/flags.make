@@ -6,5 +6,5 @@ CXX_FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/Ma
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/local/Cellar/raylib/2.5.0/include 
+CXX_INCLUDES = -I/usr/local/Cellar/raylib/2.6.0/include 
 
