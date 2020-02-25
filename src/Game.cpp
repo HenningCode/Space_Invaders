@@ -13,6 +13,7 @@
 Game::Game(int width, int height): m_ScreenWidth(width), m_ScreenHeight(height), m_Score(0), m_Quit(false), m_Name() {
     InitWindow(m_ScreenWidth, m_ScreenHeight, "SpaceInvaders");
     SetTargetFPS(300);
+    SetTextureFilter(GetFontDefault().texture, FILTER_POINT);
 
     m_Textures = LoadTexture("../assets/Space_Invaders.png");
     m_StartButton = LoadTexture("../assets/Start_Button.png");
@@ -46,14 +47,21 @@ bool Game::GetHighscoreName(){
     bool done = false;
     int key = GetKeyPressed();
 
+
     while(key > 0){
-        m_Name += (char)key;
-        key = 0;
+        if ((key >= 32) && (key <= 125) && m_Name.size() < 9){
+            m_Name += (char)key;
+        }
+        key = GetKeyPressed();
     }
-    if(IsKeyPressed(KEY_BACKSPACE))
+    if(IsKeyPressed(KEY_BACKSPACE)) {
         m_Name.pop_back();
-    if(IsKeyPressed(KEY_ENTER))
+    }
+    if(IsKeyPressed(KEY_ENTER)) {
         done = true;
+        std::cout << "WHAT" << std::endl;
+    }
+
     return done;
 }
 
@@ -167,8 +175,10 @@ void Game::UpdateEndscreen(){
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
             m_Screen = Screens::START;
     }else{
-        if(GetHighscoreName())
-            m_ScoreManager->SaveNewHighscore(m_Name,m_Score);
+        if(GetHighscoreName()) {
+            m_ScoreManager->SaveNewHighscore(m_Name, m_Score);
+            m_Screen = Screens::START;
+        }
      }
 }
 
@@ -270,7 +280,7 @@ void Game::DrawGameOverScreen(){
     DrawText("Game Over!", m_ScreenWidth / 2 - gameOver/2, 70, 30, WHITE);
     DrawText(FormatText("Score: %05i",m_Score), m_ScreenWidth/2 - score/2, 170, 20, WHITE);
 
-    if(!m_NewHighscore){
+    if(!m_ScoreManager->CheckIfNewHighscore(m_Score)){
         DrawText("Click to return to Start screen!", m_ScreenWidth / 2 - returnWord/2,300,20,WHITE);
     }
     else{

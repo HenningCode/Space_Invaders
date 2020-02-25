@@ -23,7 +23,6 @@ public:
 
     void Start();
 
-
 private:
     void Update();
     void Draw();
@@ -53,7 +52,6 @@ private:
     int m_ScreenHeight;
     int m_Score;
     bool m_Quit;
-    bool m_NewHighscore;
     std::string m_Name;
     std::vector<std::pair<std::string,int>> m_Highscores;
 
@@ -69,9 +67,6 @@ private:
     Rectangle m_HighscoreBounds;
     Rectangle m_BackBounds;
     Vector2 m_MousePosition;
-
-
-
 };
 
 

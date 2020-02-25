@@ -15,10 +15,12 @@ ScoreManager::ScoreManager(int width, int height): m_ScreenWidth(width),m_Screen
 void ScoreManager::SaveNewHighscore(const std::string &name, int score) {
     std::ofstream file;
 
-    for(auto it = m_Highscores.end(); it != m_Highscores.begin(); --it){
+
+    for(auto it = m_Highscores.end()-1; it != m_Highscores.begin(); --it){
         if(it->second > score){
             m_Highscores.insert(it+1,std::make_pair(name,score));
-            m_Highscores.pop_back();
+            if(m_Highscores.size() > 8)
+                m_Highscores.pop_back();
             break;
         }
     }
@@ -33,7 +35,12 @@ void ScoreManager::SaveNewHighscore(const std::string &name, int score) {
 }
 
 bool ScoreManager::CheckIfNewHighscore(int score) {
-    return (m_Highscores.end() - 1)->second < score;
+    bool newScore = false;
+
+    if(m_Highscores.size()<8 || (m_Highscores.end()-1)->second < score)
+        newScore = true;
+
+    return newScore;
 }
 
 void ScoreManager::Draw() {
@@ -47,7 +54,6 @@ void ScoreManager::Draw() {
     }
 
     for(auto &scores:m_Highscores){
-
         DrawText(FormatText("%i. %s",i,scores.first.c_str()), m_ScreenWidth / 2 - longest_text, 20 + ((i - 1) * offset), 20, WHITE);
         DrawText(FormatText("%i",scores.second), m_ScreenWidth / 2 + longest_text, 20 + ((i - 1) * offset), 20, WHITE);
         ++i;
@@ -67,8 +73,10 @@ void ScoreManager::LoadHighscores() {
         return;
     while(!file.eof()){
         getline(file,line);
-        std::stringstream ss(line);
-        ss >> name >> score;
-        m_Highscores.emplace_back(std::make_pair(name,score));
+        if(!line.empty()) {
+            std::stringstream ss(line);
+            ss >> name >> score;
+            m_Highscores.emplace_back(std::make_pair(name, score));
+        }
     }
  }
