@@ -7,23 +7,21 @@
 
 #include <raylib.h>
 #include "../include/Projectile.h"
+#include "GameObject.h"
 
 enum class Direction{RIGHT, LEFT};
 
-class Enemy {
+class Enemy: public GameObject {
 public:
-    Enemy(int xStart, int yStart, int movingRange, bool shootingAllowed, Texture2D texture);
+    Enemy(int xStart, int yStart, int movingRange, int type, bool shootingAllowed, Texture2D texture);
 
-    void Draw();
-    Projectile* Update();
-    void BulletHit();
-    Vector2 GetPosition();
+    void Draw() override;
+    void Update() override;
+    Vector2 GetPosition() override;
 
 private:
-    int m_Width;
-    int m_Height;
     float m_Timer;
-    int m_MovingRange;
+    int m_Counter;
     int m_xStart;
 
     Direction m_Direction;
@@ -32,6 +30,8 @@ private:
     Texture2D m_EnemyTexture;
 
     Rectangle m_EnemyRectangle;
+    Rectangle m_EnemyRectangle2;
+    Rectangle* m_ActiveFrame;
     Vector2 m_EnemyPosition;
 };
 

@@ -3,19 +3,20 @@
 //
 
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <random>
 #include "../include/Game.h"
 #include "../include/Enemy.h"
 #include "../include/Player.h"
 #include "../include/ScoreManager.h"
 
-Game::Game(int width, int height): m_ScreenWidth(width), m_ScreenHeight(height), m_Score(0), m_Quit(false), m_Name() {
+Game::Game(int width, int height): m_ScreenWidth(width), m_ScreenHeight(height), m_Score(0), m_Quit(false), m_Name(),m_Timer(0) {
     InitWindow(m_ScreenWidth, m_ScreenHeight, "SpaceInvaders");
     SetTargetFPS(300);
     SetTextureFilter(GetFontDefault().texture, FILTER_POINT);
 
     m_Textures = LoadTexture("../assets/Space_Invaders.png");
+    m_EnemyTexture = LoadTexture("../assets/Enemys.png");
     m_StartButton = LoadTexture("../assets/Start_Button.png");
     m_QuitButton = LoadTexture("../assets/Quit_Button.png");
     m_HighscoreButton = LoadTexture("../assets/Highscore_Button.png");
@@ -63,6 +64,29 @@ bool Game::GetHighscoreName(){
     }
 
     return done;
+}
+
+void Game::HandleInput(){
+    if(IsKeyDown(KEY_LEFT)) {
+        m_Player->ChangeDirection(Direction::LEFT);
+        m_Player->Update();
+    }
+    if(IsKeyDown(KEY_RIGHT)) {
+        m_Player->ChangeDirection(Direction::RIGHT);
+        m_Player->Update();
+    }
+    if(IsKeyPressed(KEY_SPACE)) {
+        if (m_PlayerProjectile == nullptr) {
+            CreateProjectile(ProjectileSource::PLAYER, m_Player);
+        }
+    }
+}
+
+void Game::CreateProjectile(ProjectileSource source,GameObject* object) {
+    if(source == ProjectileSource::PLAYER)
+        m_PlayerProjectile = new Projectile(ProjectileSource::PLAYER, object->GetPosition(),m_Textures);
+    else
+        m_EnemyProjectiles.emplace_back(new Projectile(ProjectileSource::ENEMY, object->GetPosition(),m_Textures));
 }
 
 void Game::Start() {
@@ -128,21 +152,18 @@ void Game::UpdateStart() {
 //Function that updates Player Enemy and Projectile positions
 void Game::UpdateGame(){
     //Temp Variable
-    Projectile* projectile;
+    m_Timer++;
     //Check If either an Enemy or the Player got it
     CheckHit();
     //Update Player and if Spacebar got it return a new Projectile
-    projectile = m_Player->Update();
-    if(projectile != nullptr)
-        m_PlayerProjectile = projectile;
-    //Update all Enemys and if they shoot a new Projectile is returned
-    //and placed into the vector
-    for(auto &m_Enemy: m_Enemys) {
-        projectile = m_Enemy->Update();
-        if(projectile != nullptr) {
-            m_EnemyProjectiles.emplace_back(projectile);
-        }
+    HandleInput();
+    //Update all Enemys
+    for(auto &enemy: m_Enemys){
+        enemy->Update();
+        if(GenerateRandomInt(0, 1000) == 999)
+            CreateProjectile(ProjectileSource::ENEMY,enemy);
     }
+
     //Update Enemy Projectiles and delete them if they are out of the screen
     for(auto pIt = m_EnemyProjectiles.begin(); pIt != m_EnemyProjectiles.end();){
         (*pIt)->Update();
@@ -157,9 +178,10 @@ void Game::UpdateGame(){
         m_PlayerProjectile->Update();
     //Delete PlayerProjectile if out of screen and let the Player shoot again
     if(m_PlayerProjectile != nullptr && m_PlayerProjectile->GetPosition().y < 0) {
+        delete m_PlayerProjectile;
         m_PlayerProjectile = nullptr;
-        m_Player->ResetGun();
     }
+
     //If they player got no lives the game is over
     if(m_Player->GetLifes() == 0) {
         delete m_Player;
@@ -223,7 +245,6 @@ void Game::CheckHit() {
                 delete(m_PlayerProjectile);
                 m_PlayerProjectile = nullptr;
                 enemy = m_Enemys.erase(enemy);
-                m_Player->ResetGun();
                 break;
             } else {
                 ++enemy;
@@ -297,20 +318,24 @@ void Game::DrawHighscore(){
 }
 
 void Game::CreateLevel1(){
-    m_Enemys.emplace_back(new Enemy(100,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(150,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(200,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(250,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(300,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(350,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(400,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(450,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(500,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(200,100,50,true,m_Textures));
+    m_Enemys.emplace_back(new Enemy(100, 50, 50, 1,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(150, 50, 50, 2,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(200, 50, 50, 1,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(250, 50, 50, 2,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(300, 50, 50, 1,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(350, 50, 50, 2,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(400, 50, 50, 1,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(450, 50, 50, 2,true, m_EnemyTexture));
+    m_Enemys.emplace_back(new Enemy(500, 50, 50, 1,true, m_EnemyTexture));
+
 }
 
-void Game::CreateLevel2(){
-    m_Enemys.emplace_back(new Enemy(150,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(300,50,50,true,m_Textures));
-    m_Enemys.emplace_back(new Enemy(450,50,50,true,m_Textures));
+int Game::GenerateRandomInt(int a, int b){
+    int number = 0;
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 eng(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(a, b);
+    number = distr(eng);
+
+    return number;
 }

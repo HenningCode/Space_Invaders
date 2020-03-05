@@ -7,19 +7,22 @@
 
 #include <raylib.h>
 #include "../include/Projectile.h"
+#include "GameObject.h"
+#include "Enemy.h"
 
-class Player {
+class Player: public GameObject {
 public:
     Player(int,int, Texture2D);
 
-    Projectile* Update();
-    void Draw();
+    void Update() override;
+    void Draw() override;
 
-    void ResetGun();
+    void ChangeDirection(Direction dir);
+
     void PlayerHit();
 
     int GetLifes();
-    Vector2 GetPosition();
+    Vector2 GetPosition() override;
 
 
 private:
@@ -28,6 +31,7 @@ private:
     int m_PlayerWidth;
     int m_PlayerHeight;
     int m_Lives;
+    Direction m_Direction;
 
     Texture2D m_PlayerTexture;
 
@@ -38,8 +42,6 @@ private:
     Vector2 m_PlayerPosition;
 
     bool m_BulletActive;
-
-
 };
 
 

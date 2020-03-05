@@ -17,7 +17,7 @@ public:
 
     Vector2 GetPosition();
 private:
-
+    int m_Direction;
     Texture2D m_Texture;
     Vector2 m_Position;
     ProjectileSource m_Source;

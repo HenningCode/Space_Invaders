@@ -7,10 +7,8 @@
 #include <raylib.h>
 #include <iostream>
 
-Player::Player(int xPosition, int yPosition, Texture2D texture): m_xPosition(xPosition), m_yPosition(yPosition), m_BulletActive(false), m_Lives(3),m_PlayerTexture(texture) {
-
-    m_PlayerWidth = 21;
-    m_PlayerHeight = 14;
+Player::Player(int xPosition, int yPosition, Texture2D texture): m_xPosition(xPosition), m_yPosition(yPosition), m_BulletActive(false), m_Lives(3),m_PlayerTexture(texture)
+,m_Direction(),m_PlayerWidth(21),m_PlayerHeight(14) {
 
     m_PlayerRectangle = {0,0,(float)m_PlayerWidth,(float)m_PlayerHeight};
     m_PlayerPosition = {300-10,350};
@@ -20,21 +18,12 @@ Player::Player(int xPosition, int yPosition, Texture2D texture): m_xPosition(xPo
 
 }
 
-Projectile* Player::Update() {
-    if(IsKeyDown(KEY_RIGHT))
-        if(m_PlayerPosition.x <= 550-m_PlayerWidth)
-            m_PlayerPosition.x++;
-    if(IsKeyDown(KEY_LEFT))
-        if(m_PlayerPosition.x >= 50)
-            m_PlayerPosition.x--;
-    if(IsKeyPressed(KEY_SPACE)){
-        if(!m_BulletActive){
-            m_BulletActive = true;
-            return new Projectile(ProjectileSource::PLAYER,m_PlayerPosition,m_PlayerTexture);
-        }
-    }
+void Player::Update() {
+    if(m_Direction == Direction::RIGHT && m_PlayerPosition.x < 550)
+        m_PlayerPosition.x++;
+    else if(m_Direction == Direction::LEFT && m_PlayerPosition.x > 50)
+        m_PlayerPosition.x--;
 
-    return nullptr;
 }
 
 void Player::Draw() {
@@ -61,12 +50,14 @@ void Player::Draw() {
             break;
 
     }
-
     DrawTextureRec(m_PlayerTexture,m_PlayerRectangle,m_PlayerPosition,WHITE);
 }
 
-void Player::ResetGun() {
-    m_BulletActive = false;
+void Player::ChangeDirection(Direction dir) {
+    if(dir == Direction::RIGHT)
+        m_Direction = Direction::RIGHT;
+    else
+        m_Direction = Direction::LEFT;
 }
 
 void Player::PlayerHit() {

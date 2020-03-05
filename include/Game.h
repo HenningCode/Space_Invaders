@@ -24,9 +24,11 @@ public:
     void Start();
 
 private:
+    void HandleInput();
     void Update();
     void Draw();
     void CheckHit();
+    void CreateProjectile(ProjectileSource source ,GameObject* object);
 
     void DrawStartScreen();
     void DrawGameScreen();
@@ -41,6 +43,7 @@ private:
     void UpdateEndscreen();
 
     bool GetHighscoreName();
+    static int GenerateRandomInt(int a, int b);
 
     std::list<Enemy*> m_Enemys;
     std::list<Projectile*> m_EnemyProjectiles;
@@ -51,11 +54,13 @@ private:
     int m_ScreenWidth;
     int m_ScreenHeight;
     int m_Score;
+    int m_Timer;
     bool m_Quit;
     std::string m_Name;
     std::vector<std::pair<std::string,int>> m_Highscores;
 
     Texture2D m_Textures;
+    Texture2D m_EnemyTexture;
     Texture2D m_StartButton;
     Texture2D m_QuitButton;
     Texture2D m_HighscoreButton;

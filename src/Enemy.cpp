@@ -3,57 +3,60 @@
 //
 
 #include "../include/Enemy.h"
-#include "../include/Projectile.h"
-#include <iostream>
 #include <random>
 
-Enemy::Enemy(int xStart, int yStart, int movingRange, bool shootingAllowed, Texture2D texture): m_AllowedToShoot(shootingAllowed), m_MovingRange(movingRange),
-m_xStart(xStart), m_Timer(0.f), m_EnemyTexture(texture){
+Enemy::Enemy(int xStart, int yStart, int movingRange, int type, bool shootingAllowed, Texture2D texture):
+m_AllowedToShoot(shootingAllowed),m_xStart(xStart), m_Timer(0.f), m_EnemyTexture(texture),m_Counter(0){
 
-    m_Width = 24;
-    m_Height = 15;
+    switch(type){
+        case 1:
+            m_EnemyRectangle = {0,0,26,18};
+            m_EnemyRectangle2 = {32,0,30,20};
+            break;
+        case 2:
+            m_EnemyRectangle = {2,22,22,24};
+            m_EnemyRectangle2 = {33,22,26,24};
+            break;
+        default:
+            m_EnemyRectangle = {0,0,26,18};
+            m_EnemyRectangle2 = {32,0,30,20};
+            break;
+    }
 
     m_Direction = Direction::RIGHT;
 
-    m_EnemyRectangle = {33,0,(float)m_Width,(float)m_Height};
+    m_ActiveFrame = &m_EnemyRectangle;
     m_EnemyPosition = {(float)xStart,(float)yStart};
 }
 
-Projectile* Enemy::Update() {
+void Enemy::Update() {
     m_Timer += GetFrameTime();
 
-    if(m_Timer >= 0.05f){
+    if(m_Timer >= 0.6f){
+        m_Counter++;
+        if (m_ActiveFrame == &m_EnemyRectangle)
+            m_ActiveFrame = &m_EnemyRectangle2;
+        else
+            m_ActiveFrame = &m_EnemyRectangle;
         m_Timer = 0;
-        if(m_Direction == Direction::RIGHT){
-            if(((int)m_EnemyPosition.x - m_xStart) >= m_MovingRange)
+        if(m_Counter >= 7) {
+            m_EnemyPosition.y += 20;
+            m_Counter = 0;
+            if(m_Direction == Direction::RIGHT)
                 m_Direction = Direction::LEFT;
             else
-                m_EnemyPosition.x ++;
-        } else
-            if((m_xStart - (int)m_EnemyPosition.x) >= m_MovingRange)
                 m_Direction = Direction::RIGHT;
+        }else {
+            if (m_Direction == Direction::RIGHT)
+                m_EnemyPosition.x += 10;
             else
-                m_EnemyPosition.x --;
-    }
-
-    if(m_AllowedToShoot){
-        std::random_device r;
-
-        // Choose a random mean between 1 and 6
-        std::default_random_engine e1(r());
-        std::uniform_int_distribution<int> uniform_dist(1, 1000);
-        int mean = uniform_dist(e1);
-        if(mean == 10){
-            return new Projectile(ProjectileSource::ENEMY,m_EnemyPosition,m_EnemyTexture);
+                m_EnemyPosition.x -= 10;
         }
-
     }
-    return nullptr;
 }
 
-
 void Enemy::Draw() {
-    DrawTextureRec(m_EnemyTexture,m_EnemyRectangle,m_EnemyPosition,WHITE);
+    DrawTextureRec(m_EnemyTexture, *m_ActiveFrame, m_EnemyPosition, WHITE);
 }
 
 Vector2 Enemy::GetPosition() {

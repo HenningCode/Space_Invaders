@@ -16,7 +16,7 @@ void ScoreManager::SaveNewHighscore(const std::string &name, int score) {
     std::ofstream file;
 
 
-    for(auto it = m_Highscores.end()-1; it != m_Highscores.begin(); --it){
+    for(auto it = m_Highscores.end()-1; it != m_Highscores.begin()-1; --it){
         if(it->second > score){
             m_Highscores.insert(it+1,std::make_pair(name,score));
             if(m_Highscores.size() > 8)
